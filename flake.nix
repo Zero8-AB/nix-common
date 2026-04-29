@@ -7,44 +7,13 @@
   };
 
   outputs = {
+    # deadnix: skip
     self,
     nixpkgs,
     flake-utils,
   }: let
-    mkChecks = system: {
-      src,
-      enableStatix ? true,
-      enableDeadnix ? true,
-    }: let
-      pkgs = import nixpkgs {inherit system;};
-      inherit (pkgs) lib;
-    in
-      lib.optionalAttrs enableStatix {
-        statix =
-          pkgs.runCommand "statix-check" {
-            nativeBuildInputs = [pkgs.statix];
-          } ''
-            set -euo pipefail
-            cp -r ${src} repo
-            chmod -R +w repo
-            cd repo
-            statix check .
-            mkdir -p $out
-          '';
-      }
-      // lib.optionalAttrs enableDeadnix {
-        deadnix =
-          pkgs.runCommand "deadnix-check" {
-            nativeBuildInputs = [pkgs.deadnix];
-          } ''
-            set -euo pipefail
-            cp -r ${src} repo
-            chmod -R +w repo
-            cd repo
-            deadnix -f .
-            mkdir -p $out
-          '';
-      };
+    nix-checks = import ./lib/nix-checks.nix {inherit nixpkgs;};
+    nuget-packageslock2nix = import ./lib/nuget-packageslock2nix.nix {inherit nixpkgs;};
   in
     flake-utils.lib.eachDefaultSystem (system: let
       pkgs = import nixpkgs {inherit system;};
@@ -57,8 +26,14 @@
           alejandra
         ];
       };
+
+      checks = nix-checks system {
+        src = ./.;
+      };
     })
     // {
-      lib.mkChecks = mkChecks;
+      lib = {
+        inherit nix-checks nuget-packageslock2nix;
+      };
     };
 }
