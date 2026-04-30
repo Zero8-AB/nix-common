@@ -11,4 +11,4 @@ system: let
   };
 in
   map.${system}
-  or (throw "systemToRuntimeId: unsupported system '${system}'. Supported: ${builtins.toString (builtins.attrNames map)}");
+  or (throw "systemToRuntimeId: unsupported system '${system}'. Supported: ${builtins.toString (builtins.attrNames map)}")
