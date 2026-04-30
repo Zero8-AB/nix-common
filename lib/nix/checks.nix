@@ -1,9 +1,8 @@
-{nixpkgs}: system: {
+pkgs: {
   src,
   enableStatix ? true,
   enableDeadnix ? true,
 }: let
-  pkgs = import nixpkgs {inherit system;};
   inherit (pkgs) lib;
 in
   lib.optionalAttrs enableStatix {

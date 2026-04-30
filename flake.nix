@@ -12,8 +12,10 @@
     nixpkgs,
     flake-utils,
   }: let
-    nix-checks = import ./lib/nix/checks.nix {inherit nixpkgs;};
-    findFiles = import ./lib/nix/findFiles.nix;
+    nix-lib = import ./lib/nix;
+    dotnet-lib = import ./lib/dotnet {inherit nix-lib;};
+    go-lib = import ./lib/go;
+    docker-lib = import ./lib/docker;
   in
     flake-utils.lib.eachDefaultSystem (system: let
       pkgs = import nixpkgs {inherit system;};
@@ -27,29 +29,18 @@
         ];
       };
 
-      checks = nix-checks system {
+      checks = nix-lib.mkChecks pkgs {
         src = ./.;
       };
+
+      formatter = pkgs.alejandra;
     })
     // {
       lib = {
-        nix = {
-          inherit findFiles;
-          checks = nix-checks;
-        };
-        dotnet = {
-          nuget-packagesLock2Nix = import ./lib/dotnet/nuget-packageslock2nix.nix {inherit nixpkgs;};
-          getRuntimeId = import ./lib/dotnet/runtimeid.nix;
-
-          findLockFiles = {
-            src,
-            excludeDirs ? [".git" "node_modules" "bin" "obj"],
-          }:
-            findFiles {
-              inherit src excludeDirs;
-              pattern = "packages.lock.json";
-            };
-        };
+        nix = nix-lib;
+        dotnet = dotnet-lib;
+        go = go-lib;
+        docker = docker-lib;
       };
     };
 }
