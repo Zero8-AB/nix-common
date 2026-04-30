@@ -1,4 +1,4 @@
-_: {
+{
   src,
   excludeDirs ? ["bin" "obj" "node_modules" ".git" ".github"],
 }: let
