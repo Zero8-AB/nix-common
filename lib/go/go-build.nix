@@ -1,9 +1,9 @@
 pkgs: {
+  self ? null,
   pname,
   version,
   src,
   subPackages,
-  self,
   vendorHash ? null,
   meta ? {},
 }:
