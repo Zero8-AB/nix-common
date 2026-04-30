@@ -13,7 +13,7 @@
     flake-utils,
   }: let
     nix-checks = import ./lib/nix/checks.nix {inherit nixpkgs;};
-    findFiles = import ./lib/nix/findFiles.nix {inherit nixpkgs;};
+    findFiles = import ./lib/nix/findFiles.nix;
   in
     flake-utils.lib.eachDefaultSystem (system: let
       pkgs = import nixpkgs {inherit system;};
@@ -34,6 +34,7 @@
     // {
       lib = {
         nix = {
+          inherit findFiles;
           checks = nix-checks;
         };
         dotnet = {
