@@ -1,11 +1,10 @@
-{nixpkgs}: system: {
+pkgs: {
   # deadnix: skip
   name ? "project",
   lockfiles ? [],
   excludePackages ? [],
   sources ? [],
 }: let
-  pkgs = import nixpkgs {inherit system;};
   inherit
     (pkgs.lib)
     foldl'
