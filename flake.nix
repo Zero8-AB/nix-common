@@ -13,6 +13,7 @@
     flake-utils,
   }: let
     nix-checks = import ./lib/nix/checks.nix {inherit nixpkgs;};
+    findFiles = import ./lib/nix/findFiles.nix {inherit nixpkgs;};
   in
     flake-utils.lib.eachDefaultSystem (system: let
       pkgs = import nixpkgs {inherit system;};
@@ -38,7 +39,15 @@
         dotnet = {
           nuget-packagesLock2Nix = import ./lib/dotnet/nuget-packageslock2nix.nix {inherit nixpkgs;};
           getRuntimeId = import ./lib/dotnet/runtimeid.nix;
-          findLockFiles = import ./lib/dotnet/findLockFiles.nix;
+
+          findLockfiles = {
+            src,
+            excludeDirs ? [".git" "node_modules" "bin" "obj"],
+          }:
+            findFiles {
+              inherit src excludeDirs;
+              pattern = "packages.lock.json";
+            };
         };
       };
     };
