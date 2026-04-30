@@ -13,9 +13,6 @@
     flake-utils,
   }: let
     nix-checks = import ./lib/nix/checks.nix {inherit nixpkgs;};
-
-    dotnet-getruntimeid = import ./lib/dotnet/runtimeid.nix {inherit nixpkgs;};
-    nuget-packageslock2nix = import ./lib/dotnet/nuget-packageslock2nix.nix {inherit nixpkgs;};
   in
     flake-utils.lib.eachDefaultSystem (system: let
       pkgs = import nixpkgs {inherit system;};
@@ -39,8 +36,8 @@
           checks = nix-checks;
         };
         dotnet = {
-          inherit nuget-packageslock2nix;
-          getruntimeid = dotnet-getruntimeid;
+          nuget-packagesLock2Nix = import ./lib/dotnet/nuget-packageslock2nix.nix {inherit nixpkgs;};
+          getRuntimeId = import ./lib/dotnet/runtimeid.nix;
         };
       };
     };
