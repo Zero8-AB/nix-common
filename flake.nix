@@ -38,6 +38,7 @@
         dotnet = {
           nuget-packagesLock2Nix = import ./lib/dotnet/nuget-packageslock2nix.nix {inherit nixpkgs;};
           getRuntimeId = import ./lib/dotnet/runtimeid.nix;
+          findLockFiles = import ./lib/dotnet/findLockFiles.nix;
         };
       };
     };
