@@ -36,7 +36,7 @@
     // {
       lib = {
         nix = {
-          inherit nix-checks;
+          checks = nix-checks;
         };
         dotnet = {
           inherit nuget-packageslock2nix;
