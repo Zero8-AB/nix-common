@@ -39,8 +39,8 @@
           yamlfmt
           actionlint
 
-          nodePackages.prettier
-          nodePackages.eslint
+          prettier
+          eslint
         ];
       };
 
