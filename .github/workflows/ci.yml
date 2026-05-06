@@ -30,7 +30,7 @@ jobs:
 
       - name: Write NuGet netrc
         id: nuget-netrc
-        uses: ./.github/actions/nuget-netrc
+        uses: ./actions/nuget-netrc
         with:
           token: test-token-for-ci
           path: ${{ runner.temp }}/ci-secrets/nuget.netrc
