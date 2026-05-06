@@ -70,7 +70,7 @@ in {
   formatting =
     pkgs.runCommand "javascript-formatting-check" {
       nativeBuildInputs = [
-        pkgs.nodePackages.prettier
+        pkgs.prettier
       ];
     } ''
       cd ${src}
@@ -85,8 +85,7 @@ in {
   lint =
     pkgs.runCommand "javascript-lint-check" {
       nativeBuildInputs = [
-        pkgs.nodejs
-        pkgs.nodePackages.eslint
+        pkgs.eslint
       ];
     } ''
       cd ${src}
