@@ -1,0 +1,29 @@
+name: Write NuGet netrc
+description: Writes a temporary NuGet netrc file
+
+inputs:
+  login:
+    description: netrc login
+    required: false
+    default: github-actions
+  token:
+    description: GitHub Packages read token
+    required: true
+  path:
+    description: Path to write the netrc file
+    required: false
+    default: /tmp/nuget.netrc
+  machine:
+    description: NuGet package host
+    required: false
+    default: nuget.pkg.github.com
+
+outputs:
+  path:
+    description: Path to the written netrc file
+
+runs:
+  using: node24
+  main: src/main.js
+  post: src/post.js
+  post-if: always()

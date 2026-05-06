@@ -16,6 +16,15 @@
     dotnet-lib = import ./lib/dotnet {inherit nix-lib;};
     go-lib = import ./lib/go;
     docker-lib = import ./lib/docker;
+    js-lib = import ./lib/javascript {inherit nix-lib;};
+    yaml-lib = import ./lib/yaml {inherit nix-lib;};
+    github-lib = import ./lib/github;
+
+    prefixChecks = prefix:
+      nixpkgs.lib.mapAttrs' (name: value: {
+        name = "${prefix}-${name}";
+        inherit value;
+      });
   in
     flake-utils.lib.eachDefaultSystem (system: let
       pkgs = import nixpkgs {inherit system;};
@@ -26,12 +35,29 @@
           statix
           deadnix
           alejandra
+
+          yamlfmt
+          actionlint
+
+          nodePackages.prettier
+          nodePackages.eslint
         ];
       };
 
-      checks = nix-lib.mkChecks pkgs {
-        src = ./.;
-      };
+      checks =
+        prefixChecks "nix" (nix-lib.mkChecks pkgs {
+          src = ./.;
+        })
+        // prefixChecks "javascript" (js-lib.mkChecks pkgs {
+          src = ./.github/actions;
+        })
+        // prefixChecks "yaml" (yaml-lib.mkChecks {
+          inherit pkgs;
+          src = ./.github;
+        })
+        // prefixChecks "github" (github-lib.mkChecks {
+          inherit pkgs;
+        });
 
       formatter = pkgs.alejandra;
     })
@@ -41,6 +67,7 @@
         dotnet = dotnet-lib;
         go = go-lib;
         docker = docker-lib;
+        js = js-lib;
       };
     };
 }
