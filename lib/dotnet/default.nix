@@ -1,6 +1,7 @@
 {nix-lib}: {
   mkNugetDepsFromLockFile = import ./packages-to-nuget-deps.nix;
   systemToRuntimeId = import ./system-to-runtime-id.nix;
+  packageNuget = import ./package-nuget.nix;
   findLockFiles = {
     src,
     excludeDirs ? [".git" "node_modules" "bin" "obj"],
