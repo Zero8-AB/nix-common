@@ -49,7 +49,7 @@
           src = ./.;
         })
         // prefixChecks "javascript" (js-lib.mkChecks pkgs {
-          src = ./.github/actions;
+          src = ./actions;
         })
         // prefixChecks "yaml" (yaml-lib.mkChecks {
           inherit pkgs;

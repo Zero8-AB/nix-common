@@ -1,0 +1,43 @@
+name: ✅ CI
+
+on:
+  workflow_dispatch:
+  pull_request:
+    branches: ["main"]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install Nix
+        uses: DeterminateSystems/nix-installer-action@main
+
+      - name: Nix cache
+        uses: DeterminateSystems/magic-nix-cache-action@main
+
+      - name: Flake validation
+        uses: DeterminateSystems/flake-checker-action@main
+
+      - name: Check flake
+        run: make check
+
+      - name: Create test secret directory
+        run: |
+          mkdir -p "$RUNNER_TEMP/ci-secrets"
+
+      - name: Write NuGet netrc
+        id: nuget-netrc
+        uses: ./.github/actions/nuget-netrc
+        with:
+          token: test-token-for-ci
+          path: ${{ runner.temp }}/ci-secrets/nuget.netrc
+
+      - name: Verify NuGet netrc was written
+        run: |
+          test -f "${{ steps.nuget-netrc.outputs.path }}"
+          grep -q "machine nuget.pkg.github.com" "${{ steps.nuget-netrc.outputs.path }}"
+          grep -q "login github-actions" "${{ steps.nuget-netrc.outputs.path }}"
+          grep -q "password test-token-for-ci" "${{ steps.nuget-netrc.outputs.path }}"
