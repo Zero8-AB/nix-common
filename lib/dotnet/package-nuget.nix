@@ -2,15 +2,13 @@
   pkgs,
   version,
   src,
-  dotnetSdk,
+  dotnet-sdk,
   nugetDeps,
   projectFile,
 }:
 pkgs.buildDotnetModule {
   pname = "build-nuget";
-  inherit version src nugetDeps projectFile;
-
-  dotnet-sdk = dotnetSdk;
+  inherit version src nugetDeps projectFile dotnet-sdk;
 
   packNupkg = true;
   executables = [];
