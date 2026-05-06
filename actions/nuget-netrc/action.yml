@@ -1,5 +1,5 @@
-name: Write NuGet netrc
-description: Writes a temporary NuGet netrc file
+name: Write NuGet credential 
+description: Writes a temporary NuGet credential file
 
 inputs:
   login:
