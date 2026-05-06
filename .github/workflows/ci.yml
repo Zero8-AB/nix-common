@@ -22,7 +22,7 @@ jobs:
         uses: DeterminateSystems/flake-checker-action@main
 
       - name: Check flake
-        run: make check
+        run: nix flake check
 
       - name: Create test secret directory
         run: |
