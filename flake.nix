@@ -19,6 +19,7 @@
     js-lib = import ./lib/javascript {inherit nix-lib;};
     yaml-lib = import ./lib/yaml {inherit nix-lib;};
     github-lib = import ./lib/github;
+    nginx-lib = import ./lib/nginx;
 
     prefixChecks = prefix:
       nixpkgs.lib.mapAttrs' (name: value: {
@@ -68,6 +69,7 @@
         go = go-lib;
         docker = docker-lib;
         js = js-lib;
+        nginx = nginx-lib;
       };
     };
 }
