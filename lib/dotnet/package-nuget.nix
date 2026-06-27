@@ -5,7 +5,7 @@
   dotnet-sdk,
   nugetDeps,
   projectFile,
-  pname ? "build-nuget"
+  pname ? "build-nuget",
 }:
 pkgs.buildDotnetModule {
   inherit pname version src nugetDeps projectFile dotnet-sdk;
