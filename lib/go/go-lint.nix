@@ -22,8 +22,17 @@ in
 
       export HOME=$(mktemp -d)
 
-      gofiles=$(find . ${pruneArgs} -name '*.go' -print \
-        | xargs --no-run-if-empty grep -LE '^// Code generated .* DO NOT EDIT\.')
+      gofiles=$(
+        find . ${pruneArgs} -name '*.go' -print |
+          while IFS= read -r file; do
+            if ! grep -Eq '^// Code generated .* DO NOT EDIT\.' "$file"; then
+              printf '%s\n' "$file"
+            fi
+          done
+      )
+
+      echo "Checking files $gofiles"
+
       if [ -n "$gofiles" ]; then
         unformatted=$(gofmt -l $gofiles)
         if [ -n "$unformatted" ]; then
