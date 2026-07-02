@@ -1,6 +1,7 @@
 {
   mkChecks = import ./checks.nix;
   findFiles = import ./find-files.nix;
+  prettyPrintCheck = import ./pretty-print-check.nix;
   path.toRelative = {
     base,
     path,

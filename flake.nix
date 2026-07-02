@@ -13,8 +13,9 @@
     flake-utils,
   }: let
     nix-lib = import ./lib/nix;
+    postgres-lib = import ./lib/postgres;
     dotnet-lib = import ./lib/dotnet {inherit nix-lib;};
-    go-lib = import ./lib/go;
+    go-lib = import ./lib/go {inherit nix-lib postgres-lib;};
     docker-lib = import ./lib/docker;
     js-lib = import ./lib/javascript {inherit nix-lib;};
     yaml-lib = import ./lib/yaml {inherit nix-lib;};
@@ -70,6 +71,7 @@
         docker = docker-lib;
         js = js-lib;
         nginx = nginx-lib;
+        postgres = postgres-lib;
       };
     };
 }

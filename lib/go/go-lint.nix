@@ -1,4 +1,4 @@
-pkgs: {
+{nix-lib}: pkgs: {
   pname,
   version,
   src,
@@ -10,6 +10,8 @@ pkgs: {
     pkgs.lib.concatMapStringsSep " "
     (p: "-path ${pkgs.lib.escapeShellArg p} -prune -o")
     (["./vendor"] ++ excludePaths);
+
+  prettyPrintCheck = nix-lib.prettyPrintCheck {inherit (pkgs) lib;};
 in
   pkgs.buildGoModule {
     pname = "${pname}-lint";
@@ -21,6 +23,27 @@ in
       runHook preCheck
 
       export HOME=$(mktemp -d)
+      pretty_check_failed=0
+
+      ${prettyPrintCheck {
+        title = "GO VET FAILED";
+        command = "go vet ./...";
+        exitOnFailure = false;
+      }}
+      ${prettyPrintCheck {
+        title = "GOLANGCI-LINT failed";
+        command = "golangci-lint run ./...";
+        exitOnFailure = false;
+      }}
+      ${prettyPrintCheck {
+        title = "STATICCHECK failed";
+        command = "staticcheck ./...";
+        exitOnFailure = false;
+      }}
+
+      if [ "$pretty_check_failed" -ne 0 ]; then
+        exit 1
+      fi
 
       gofiles=$(
         find . ${pruneArgs} -name '*.go' -print |
@@ -48,10 +71,6 @@ in
           exit 1
         fi
       fi
-
-      go vet ./...
-      golangci-lint run ./...
-      staticcheck ./...
 
       runHook postCheck
     '';

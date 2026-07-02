@@ -20,6 +20,8 @@ pkgs.stdenv.mkDerivation {
         exit 1
       fi
     done
+
+    sqlc vet
   '';
 
   installPhase = "mkdir -p $out";
