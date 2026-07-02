@@ -4,11 +4,10 @@
 }: pkgs: {
   src,
   sqlcConfig ? "sqlc.analysis.yaml",
-  migrationsPath ? "database/migrations",
-  seedSql ? null,
+  migrationsPath ? "database/migrations"
 }: let
   withPgDatabase = postgres-lib.withTempPostgres pkgs;
-  goMigratePostgres = pkgs.go-migrate.overrideAttrs (old: {
+  goMigratePostgres = pkgs.go-migrate.overrideAttrs (_: {
     tags = ["postgres"];
   });
   prettyPrintCheck = nix-lib.prettyPrintCheck {inherit (pkgs) lib;};
