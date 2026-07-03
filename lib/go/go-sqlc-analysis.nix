@@ -4,7 +4,7 @@
 }: pkgs: {
   src,
   sqlcConfig ? "sqlc.analysis.yaml",
-  migrationsPath ? "database/migrations"
+  migrationsPath ? "database/migrations",
 }: let
   withPgDatabase = postgres-lib.withTempPostgres pkgs;
   goMigratePostgres = pkgs.go-migrate.overrideAttrs (_: {

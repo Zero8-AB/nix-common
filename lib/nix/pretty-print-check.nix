@@ -3,7 +3,7 @@
   command,
   logfile ? null,
   showCommand ? true,
-  exitOnFailure ? true 
+  exitOnFailure ? true,
 }: let
   safeTitle =
     lib.replaceStrings
@@ -46,10 +46,14 @@ in ''
     echo >&2 "''${red}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━''${reset}"
     echo >&2
 
-    ${if exitOnFailure then ''
+    ${
+    if exitOnFailure
+    then ''
       exit "$status"
-    '' else ''
+    ''
+    else ''
       pretty_check_failed=1
-    ''}
+    ''
+  }
   fi
 ''
