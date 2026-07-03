@@ -5,10 +5,11 @@ pkgs: {
   src,
   subPackages,
   vendorHash ? null,
+  tags ? [],
   meta ? {},
 }:
 pkgs.buildGoModule {
-  inherit pname version src vendorHash subPackages;
+  inherit pname version src vendorHash subPackages tags;
 
   meta = with pkgs.lib;
     {

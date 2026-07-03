@@ -70,6 +70,7 @@
         go = go-lib;
         docker = docker-lib;
         js = js-lib;
+        yaml = yaml-lib;
         nginx = nginx-lib;
         postgres = postgres-lib;
       };
