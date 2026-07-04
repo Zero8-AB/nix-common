@@ -1,13 +1,14 @@
 {
-  mkChecks = {pkgs}: {
-    lint =
+  mkChecks = pkgs: {src}: {
+    actionlint =
       pkgs.runCommand "github-actions-lint-check" {
-        nativeBuildInputs = [
-          pkgs.actionlint
-        ];
+        nativeBuildInputs = [pkgs.actionlint];
+        inherit src;
       } ''
-        if [ -d .github/workflows ]; then
-          actionlint
+        if [ -d "$src/.github/workflows" ]; then
+          find "$src/.github/workflows" -maxdepth 1 \
+            \( -name '*.yml' -o -name '*.yaml' \) \
+            -exec actionlint {} +
         else
           echo "No .github/workflows directory found; skipping actionlint."
         fi

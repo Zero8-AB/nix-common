@@ -20,6 +20,7 @@
     js-lib = import ./lib/javascript {inherit nix-lib;};
     yaml-lib = import ./lib/yaml {inherit nix-lib;};
     github-lib = import ./lib/github;
+    shell-lib = import ./lib/shell;
     nginx-lib = import ./lib/nginx;
 
     prefixChecks = prefix:
@@ -57,9 +58,8 @@
           inherit pkgs;
           src = ./.github;
         })
-        // prefixChecks "github" (github-lib.mkChecks {
-          inherit pkgs;
-        });
+        // github-lib.mkChecks pkgs {src = ./.;}
+        // shell-lib.mkChecks pkgs {src = ./.;};
 
       formatter = pkgs.alejandra;
     })
@@ -71,6 +71,8 @@
         docker = docker-lib;
         js = js-lib;
         yaml = yaml-lib;
+        github = github-lib;
+        shell = shell-lib;
         nginx = nginx-lib;
         postgres = postgres-lib;
       };
