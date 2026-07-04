@@ -1,6 +1,5 @@
 {nix-lib}: {
-  mkChecks = {
-    pkgs,
+  mkChecks = pkgs: {
     src,
     files ?
       nix-lib.findFiles {
@@ -42,7 +41,7 @@
       builtins.concatStringsSep "\n" relativeFiles
     );
   in {
-    formatting =
+    yaml-formatting =
       pkgs.runCommand "yaml-formatting-check" {
         nativeBuildInputs = [
           pkgs.yamlfmt

@@ -67,8 +67,8 @@ nix-lib: pkgs: {
     then ""
     else "--${name} ${toString value}";
 in {
-  formatting =
-    pkgs.runCommand "javascript-formatting-check" {
+  prettier =
+    pkgs.runCommand "javascript-prettier-check" {
       nativeBuildInputs = [
         pkgs.prettier
       ];
