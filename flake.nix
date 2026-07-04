@@ -21,6 +21,7 @@
     yaml-lib = import ./lib/yaml {inherit nix-lib;};
     github-lib = import ./lib/github;
     shell-lib = import ./lib/shell;
+    proto-lib = import ./lib/proto;
     nginx-lib = import ./lib/nginx;
 
     prefixChecks = prefix:
@@ -70,6 +71,7 @@
         yaml = yaml-lib;
         github = github-lib;
         shell = shell-lib;
+        proto = proto-lib;
         nginx = nginx-lib;
         postgres = postgres-lib;
       };

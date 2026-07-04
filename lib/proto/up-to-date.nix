@@ -1,19 +1,15 @@
 pkgs: {
   src,
+  generators ? [pkgs.protoc-gen-go pkgs.protoc-gen-go-grpc],
+  filePattern ? "*.pb.go",
   excludePaths ? ["./generated/*" "./vendor/*"],
 }: let
   excludeArgs = pkgs.lib.concatMapStringsSep " " (p: ''-not -path "${p}"'') excludePaths;
 in
   pkgs.stdenv.mkDerivation {
-    name = "proto-check";
+    name = "proto-up-to-date";
     inherit src;
-    nativeBuildInputs = with pkgs; [
-      go
-      buf
-      protobuf
-      protoc-gen-go
-      protoc-gen-go-grpc
-    ];
+    nativeBuildInputs = [pkgs.buf pkgs.protobuf] ++ generators;
 
     buildPhase = ''
       export HOME=$(mktemp -d)
@@ -21,7 +17,7 @@ in
 
       buf generate --output generated
 
-      find . -name "*.pb.go" ${excludeArgs} | while read f; do
+      find . -name "${filePattern}" ${excludeArgs} | while read f; do
         generated="generated/''${f#./}"
         if ! diff -q "$f" "$generated" > /dev/null 2>&1; then
           echo "Out of date: $f — run buf generate"
