@@ -1,5 +1,8 @@
 pkgs: {
-  src,
+  root ? null,
+  bufYaml ? "buf.yaml",
+  bufGenYaml ? "buf.gen.yaml",
+  src ? import ./source.nix pkgs {inherit root bufYaml bufGenYaml;},
   generators ? [pkgs.protoc-gen-go pkgs.protoc-gen-go-grpc],
   filePattern ? "*.pb.go",
   excludePaths ? ["./generated/*" "./vendor/*"],

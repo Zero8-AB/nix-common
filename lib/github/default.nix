@@ -1,9 +1,19 @@
 {
-  mkChecks = pkgs: {src}: {
+  mkChecks = pkgs: {src}: let
+    fs = pkgs.lib.fileset;
+    ghSrc =
+      if builtins.pathExists (src + "/.github")
+      then
+        fs.toSource {
+          root = src;
+          fileset = src + "/.github";
+        }
+      else src;
+  in {
     actionlint =
       pkgs.runCommand "github-actions-lint-check" {
         nativeBuildInputs = [pkgs.actionlint];
-        inherit src;
+        src = ghSrc;
       } ''
         if [ -d "$src/.github/workflows" ]; then
           find "$src/.github/workflows" -maxdepth 1 \

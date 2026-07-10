@@ -2,9 +2,10 @@
   nix-lib,
   postgres-lib,
 }: pkgs: {
-  src,
-  sqlcConfig ? "sqlc.analysis.yaml",
+  root ? null,
+  config ? "sqlc.analysis.yaml",
   migrationsPath ? "database/migrations",
+  src ? import ./go-sqlc-source.nix pkgs {inherit root config;},
 }: let
   withPgDatabase = postgres-lib.withTempPostgres pkgs;
   goMigratePostgres = pkgs.go-migrate.overrideAttrs (_: {
@@ -30,6 +31,6 @@ in
 
     checkPhase = prettyPrintCheck {
       title = "SQLC VET FAILED";
-      command = "sqlc vet -f ${sqlcConfig}";
+      command = "sqlc vet -f ${config}";
     };
   }
