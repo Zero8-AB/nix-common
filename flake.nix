@@ -15,14 +15,15 @@
     nix-lib = import ./lib/nix;
     postgres-lib = import ./lib/postgres;
     dotnet-lib = import ./lib/dotnet {inherit nix-lib;};
-    go-lib = import ./lib/go {inherit nix-lib postgres-lib;};
+    go-lib = import ./lib/go {inherit nix-lib postgres-lib yaml-lib;};
     docker-lib = import ./lib/docker;
     js-lib = import ./lib/javascript {inherit nix-lib;};
     yaml-lib = import ./lib/yaml {inherit nix-lib;};
     github-lib = import ./lib/github;
     shell-lib = import ./lib/shell;
-    proto-lib = import ./lib/proto;
+    proto-lib = import ./lib/proto {inherit yaml-lib;};
     nginx-lib = import ./lib/nginx;
+    fonts-lib = import ./lib/fonts;
 
     prefixChecks = prefix:
       nixpkgs.lib.mapAttrs' (name: value: {
@@ -52,9 +53,10 @@
         prefixChecks "nix" (nix-lib.mkChecks pkgs {
           src = ./.;
         })
-        // prefixChecks "javascript" (js-lib.mkChecks pkgs {
-          src = ./actions;
-        })
+        // {
+          javascript-eslint = js-lib.mkEslint pkgs {src = ./actions;};
+          javascript-prettier = js-lib.mkPrettier pkgs {src = ./actions;};
+        }
         // yaml-lib.mkChecks pkgs {src = ./.github;}
         // github-lib.mkChecks pkgs {src = ./.;}
         // shell-lib.mkChecks pkgs {src = ./.;};
@@ -73,6 +75,7 @@
         shell = shell-lib;
         proto = proto-lib;
         nginx = nginx-lib;
+        fonts = fonts-lib;
         postgres = postgres-lib;
       };
     };

@@ -1,20 +1,19 @@
 nix-lib: pkgs: {
   src,
-  files ?
-    nix-lib.findFiles {
-      inherit src;
-      pattern = name:
-        builtins.match ".*\\.(js|cjs|mjs)$" name != null;
-    },
-  eslintConfig ? null,
-  prettierConfig ? null,
+  pname ? null,
+  version ? null,
+  nodeModules ? null,
+  config ? null,
+  pattern ? name:
+    builtins.match ".*\\.(js|cjs|mjs)$" name != null,
+  nativeBuildInputs ? [],
 }: let
-  hasEslintConfig =
+  hasConfig =
     builtins.pathExists (src + "/eslint.config.js")
     || builtins.pathExists (src + "/eslint.config.mjs")
     || builtins.pathExists (src + "/eslint.config.cjs");
 
-  defaultEslintConfig = pkgs.writeText "eslint.config.mjs" ''
+  defaultConfig = pkgs.writeText "eslint.config.mjs" ''
     export default [
       {
         files: ["**/*.js", "**/*.cjs", "**/*.mjs"],
@@ -41,12 +40,14 @@ nix-lib: pkgs: {
     ];
   '';
 
-  eslintArgs =
-    if eslintConfig != null
-    then "--config ${toString eslintConfig}"
-    else if hasEslintConfig
+  configArg =
+    if config != null
+    then "--config ${toString config}"
+    else if hasConfig
     then ""
-    else "--config ${defaultEslintConfig}";
+    else "--config ${defaultConfig}";
+
+  files = nix-lib.findFiles {inherit src pattern;};
 
   relativeFiles =
     map (
@@ -58,42 +59,29 @@ nix-lib: pkgs: {
     )
     files;
 
-  fileList = pkgs.writeText "javascript-files.txt" (
+  fileList = pkgs.writeText "eslint-files.txt" (
     builtins.concatStringsSep "\n" relativeFiles
   );
+in
+  if nodeModules != null
+  then
+    import ./check.nix pkgs {
+      inherit pname version src nodeModules nativeBuildInputs;
 
-  optionalArg = name: value:
-    if value == null
-    then ""
-    else "--${name} ${toString value}";
-in {
-  prettier =
-    pkgs.runCommand "javascript-prettier-check" {
-      nativeBuildInputs = [
-        pkgs.prettier
-      ];
+      name = "eslint";
+      command = "eslint .";
+    }
+  else
+    pkgs.runCommand "javascript-eslint-check" {
+      nativeBuildInputs = [pkgs.eslint] ++ nativeBuildInputs;
     } ''
       cd ${src}
 
       if [ -s ${fileList} ]; then
-        xargs prettier --check ${optionalArg "config" prettierConfig} < ${fileList}
+        xargs --no-run-if-empty eslint ${configArg} < ${fileList}
+      else
+        echo "No JavaScript files found; skipping eslint."
       fi
 
       touch $out
-    '';
-
-  lint =
-    pkgs.runCommand "javascript-lint-check" {
-      nativeBuildInputs = [
-        pkgs.eslint
-      ];
-    } ''
-      cd ${src}
-
-      if [ -s ${fileList} ]; then
-        xargs eslint ${eslintArgs} < ${fileList}
-      fi
-
-      touch $out
-    '';
-}
+    ''

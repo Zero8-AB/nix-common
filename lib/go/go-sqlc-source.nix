@@ -1,4 +1,4 @@
-pkgs: {
+{yaml-lib}: pkgs: {
   root,
   config,
 }: let
@@ -6,11 +6,7 @@ pkgs: {
   fs = lib.fileset;
 
   configFile = root + "/${config}";
-  configJson =
-    pkgs.runCommand "${config}.json" {
-      nativeBuildInputs = [pkgs.yq-go];
-    } "yq -o=json '.' ${configFile} > $out";
-  cfg = builtins.fromJSON (builtins.readFile configJson);
+  cfg = yaml-lib.fromFile pkgs configFile;
 
   targets = lib.unique (
     builtins.concatMap (

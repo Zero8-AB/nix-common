@@ -1,4 +1,4 @@
-pkgs: {
+{yaml-lib}: pkgs: {
   root,
   bufYaml ? "buf.yaml",
   bufGenYaml ? "buf.gen.yaml",
@@ -6,17 +6,12 @@ pkgs: {
   inherit (pkgs) lib;
   fs = lib.fileset;
 
-  fromYaml = name: file:
-    builtins.fromJSON (builtins.readFile (
-      pkgs.runCommand "${name}.json" {
-        nativeBuildInputs = [pkgs.yq-go];
-      } "yq -o=json '.' ${file} > $out"
-    ));
+  fromYaml = yaml-lib.fromFile pkgs;
 
   bufYamlFile = root + "/${bufYaml}";
   bufGenFile = root + "/${bufGenYaml}";
-  buf = fromYaml "buf" bufYamlFile;
-  gen = fromYaml "buf-gen" bufGenFile;
+  buf = fromYaml bufYamlFile;
+  gen = fromYaml bufGenFile;
 
   targets = lib.unique (
     map (m: m.path) (buf.modules or [])

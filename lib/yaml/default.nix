@@ -1,4 +1,6 @@
 {nix-lib}: {
+  fromFile = import ./from-file.nix;
+
   mkChecks = pkgs: {
     src,
     config ? null,
@@ -19,12 +21,11 @@
       );
     };
 
-    files =
-      nix-lib.findFiles {
-        src = yamlSrc;
-        pattern = name:
-          builtins.match ".*\\.(yml|yaml)$" name != null;
-      };
+    files = nix-lib.findFiles {
+      src = yamlSrc;
+      pattern = name:
+        builtins.match ".*\\.(yml|yaml)$" name != null;
+    };
 
     hasConfig =
       builtins.pathExists (yamlSrc + "/.yamlfmt")

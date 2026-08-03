@@ -1,13 +1,29 @@
-pkgs: {
+{yaml-lib}: pkgs: {
   root ? null,
   bufYaml ? "buf.yaml",
   bufGenYaml ? "buf.gen.yaml",
-  src ? import ./source.nix pkgs {inherit root bufYaml bufGenYaml;},
-  generators ? [pkgs.protoc-gen-go pkgs.protoc-gen-go-grpc],
+  src ? import ./source.nix {inherit yaml-lib;} pkgs {inherit root bufYaml bufGenYaml;},
   filePattern ? "*.pb.go",
-  excludePaths ? ["./generated/*" "./vendor/*"],
+  excludePaths ? [],
 }: let
-  excludeArgs = pkgs.lib.concatMapStringsSep " " (p: ''-not -path "${p}"'') excludePaths;
+  generatedDir = "generated";
+
+  gen =
+    if root == null
+    then
+      throw ''
+        mkUpToDateCheck needs `root` so the plugin list can be read from ${bufGenYaml};
+        passing only `src` leaves nowhere to look for it.
+      ''
+    else yaml-lib.fromFile pkgs (root + "/${bufGenYaml}");
+
+  generators =
+    map (plugin: pkgs.${plugin.local})
+    (builtins.filter (plugin: plugin ? local) (gen.plugins or []));
+
+  excludeArgs =
+    pkgs.lib.concatMapStringsSep " " (p: ''-not -path "${p}"'')
+    (["./${generatedDir}/*" "./vendor/*"] ++ excludePaths);
 in
   pkgs.stdenv.mkDerivation {
     name = "proto-up-to-date";
@@ -18,10 +34,10 @@ in
       export HOME=$(mktemp -d)
       export XDG_CACHE_HOME=$(mktemp -d)
 
-      buf generate --output generated
+      buf generate --output ${generatedDir}
 
       find . -name "${filePattern}" ${excludeArgs} | while read f; do
-        generated="generated/''${f#./}"
+        generated="${generatedDir}/''${f#./}"
         if ! diff -q "$f" "$generated" > /dev/null 2>&1; then
           echo "Out of date: $f — run buf generate"
           exit 1

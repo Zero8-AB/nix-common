@@ -6,7 +6,7 @@
   nugetDeps,
   runtimeId,
   projectFile,
-  version ? "0",
+  version,
   pname ? "dotnet-format",
 }:
 pkgs.buildDotnetModule {

@@ -1,32 +1,32 @@
-pkgs: {
+{yaml-lib}: pkgs: {
   root ? null,
   config ? "sqlc.yaml",
-  src ? import ./go-sqlc-source.nix pkgs {inherit root config;},
+  src ? import ./go-sqlc-source.nix {inherit yaml-lib;} pkgs {inherit root config;},
 }:
-  pkgs.stdenv.mkDerivation {
-    name = "sqlc-check";
-    inherit src;
-    nativeBuildInputs = [pkgs.sqlc];
+pkgs.stdenv.mkDerivation {
+  name = "sqlc-check";
+  inherit src;
+  nativeBuildInputs = [pkgs.sqlc];
 
-    buildPhase = ''
-      export HOME=$(mktemp -d)
-      export XDG_CACHE_HOME=$(mktemp -d)
+  buildPhase = ''
+    export HOME=$(mktemp -d)
+    export XDG_CACHE_HOME=$(mktemp -d)
 
-      cp -R ${src} source
-      chmod -R u+w source
-      cd source
+    cp -R ${src} source
+    chmod -R u+w source
+    cd source
 
-      sqlc generate -f ${config}
+    sqlc generate -f ${config}
 
-      find . -name "*.sql.go" | while read f; do
-        if ! diff -q "$f" "${src}/''${f#./}" > /dev/null 2>&1; then
-          echo "Out of date: $f — run sqlc generate"
-          exit 1
-        fi
-      done
+    find . -name "*.sql.go" | while read f; do
+      if ! diff -q "$f" "${src}/''${f#./}" > /dev/null 2>&1; then
+        echo "Out of date: $f — run sqlc generate"
+        exit 1
+      fi
+    done
 
-      sqlc vet -f ${config}
-    '';
+    sqlc vet -f ${config}
+  '';
 
-    installPhase = "mkdir -p $out";
-  }
+  installPhase = "mkdir -p $out";
+}

@@ -1,4 +1,6 @@
 {
+  mkSandbox = import ./sandbox.nix;
+
   mkChecks = pkgs: {src}: {
     shellcheck =
       pkgs.runCommand "shellcheck" {
