@@ -6,6 +6,7 @@ pkgs: {
   command ? "vitest run",
   nativeBuildInputs ? [],
   derivationArgs ? {},
+  extraArgs ? [],
 }: let
   resultsFile = "junit.xml";
   coverageDir = "coverage";
@@ -15,7 +16,7 @@ in
 
     name = "test";
 
-    command = "${command} --outputFile.junit=${resultsFile} --coverage.reportsDirectory=${coverageDir}";
+    command = "${command} --outputFile.junit=${resultsFile} --coverage.reportsDirectory=${coverageDir} ${pkgs.lib.escapeShellArgs extraArgs}";
 
     installPhase = ''
       runHook preInstall

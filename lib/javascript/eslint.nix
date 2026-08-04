@@ -7,6 +7,7 @@ nix-lib: pkgs: {
   pattern ? name:
     builtins.match ".*\\.(js|cjs|mjs)$" name != null,
   nativeBuildInputs ? [],
+  extraArgs ? [],
 }: let
   hasConfig =
     builtins.pathExists (src + "/eslint.config.js")
@@ -69,7 +70,7 @@ in
       inherit pname version src nodeModules nativeBuildInputs;
 
       name = "eslint";
-      command = "eslint .";
+      command = "eslint ${pkgs.lib.escapeShellArgs extraArgs} .";
     }
   else
     pkgs.runCommand "javascript-eslint-check" {
@@ -78,7 +79,7 @@ in
       cd ${src}
 
       if [ -s ${fileList} ]; then
-        xargs --no-run-if-empty eslint ${configArg} < ${fileList}
+        xargs --no-run-if-empty eslint ${configArg} ${pkgs.lib.escapeShellArgs extraArgs} < ${fileList}
       else
         echo "No JavaScript files found; skipping eslint."
       fi

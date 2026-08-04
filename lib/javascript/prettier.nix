@@ -10,6 +10,7 @@ nix-lib: pkgs: {
     name
     != null,
   nativeBuildInputs ? [],
+  extraArgs ? [],
 }: let
   configArg =
     if config != null
@@ -38,7 +39,7 @@ in
       inherit pname version src nodeModules nativeBuildInputs;
 
       name = "prettier";
-      command = "prettier --check ${configArg} .";
+      command = "prettier --check ${configArg} ${pkgs.lib.escapeShellArgs extraArgs} .";
     }
   else
     pkgs.runCommand "javascript-prettier-check" {
@@ -47,7 +48,7 @@ in
       cd ${src}
 
       if [ -s ${fileList} ]; then
-        xargs --no-run-if-empty prettier --check ${configArg} < ${fileList}
+        xargs --no-run-if-empty prettier --check ${configArg} ${pkgs.lib.escapeShellArgs extraArgs} < ${fileList}
       else
         echo "No formattable files found; skipping prettier."
       fi
