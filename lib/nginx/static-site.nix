@@ -28,6 +28,8 @@ pkgs: {
     pkgs.lib.subtractLists internalVariables
     (pkgs.lib.unique (builtins.concatMap placeholders confFiles));
 
+  quoted = names: pkgs.lib.concatMapStringsSep " " (name: "'${name}'") names;
+
   listenPorts = let
     lines =
       builtins.filter builtins.isString
@@ -61,11 +63,8 @@ pkgs: {
   entrypoint = pkgs.writeShellApplication {
     name = "${pname}-entrypoint";
 
-    excludeShellChecks = ["SC2016"];
-
     runtimeInputs = [
-      pkgs.coreutils
-      pkgs.gettext
+      pkgs.pkgsStatic.busybox
       nginx
     ];
 
@@ -76,7 +75,7 @@ pkgs: {
 
       missing=""
 
-      for name in ${pkgs.lib.concatMapStringsSep " " (name: "'${name}'") variables}; do
+      for name in ${quoted variables}; do
         if [ -z "''${!name-}" ]; then
           missing="''${missing}''${missing:+, }$name"
         fi
@@ -87,17 +86,17 @@ pkgs: {
         exit 1
       fi
 
-      shellFormat=${
-        pkgs.lib.escapeShellArg
-        (pkgs.lib.concatMapStringsSep " " (name: "\$${name}")
-          (variables ++ internalVariables))
-      }
-
       mkdir -p ${confDir}/client-body ${confDir}/proxy
 
       for source in ${conf}/*; do
-        rendered=$(envsubst "$shellFormat" < "$source")
-        printf '%s\n' "$rendered" > ${confDir}/"$(basename "$source")"
+        rendered=$(<"$source")
+
+        for name in ${quoted (variables ++ internalVariables)}; do
+          placeholder="\''${$name}"
+          rendered=''${rendered//"$placeholder"/"''${!name}"}
+        done
+
+        printf '%s\n' "$rendered" > ${confDir}/"''${source##*/}"
       done
 
       exec nginx -c ${confDir}/nginx.conf -e /dev/stderr
