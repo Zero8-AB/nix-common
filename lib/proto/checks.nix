@@ -16,6 +16,23 @@ pkgs: {src}: {
       touch $out
     '';
 
+  proto-format =
+    pkgs.runCommand "proto-format" {
+      nativeBuildInputs = [pkgs.buf];
+      inherit src;
+    } ''
+      export HOME=$(mktemp -d)
+      export XDG_CACHE_HOME=$(mktemp -d)
+
+      cp -R "$src" source
+      chmod -R u+w source
+      cd source
+
+      buf format --diff --exit-code
+
+      touch $out
+    '';
+
   proto-breaking =
     pkgs.runCommand "proto-breaking" {
       nativeBuildInputs = [pkgs.buf];

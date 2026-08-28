@@ -19,6 +19,7 @@
     docker-lib = import ./lib/docker;
     js-lib = import ./lib/javascript {inherit nix-lib;};
     yaml-lib = import ./lib/yaml {inherit nix-lib;};
+    git-lib = import ./lib/git;
     github-lib = import ./lib/github;
     shell-lib = import ./lib/shell;
     proto-lib = import ./lib/proto {inherit yaml-lib;};
@@ -44,6 +45,8 @@
           yamlfmt
           actionlint
 
+          gitleaks
+
           prettier
           eslint
         ];
@@ -58,6 +61,7 @@
           javascript-prettier = js-lib.mkPrettier pkgs {src = ./actions;};
         }
         // yaml-lib.mkChecks pkgs {src = ./.github;}
+        // git-lib.mkChecks pkgs {src = ./.;}
         // github-lib.mkChecks pkgs {src = ./.;}
         // shell-lib.mkChecks pkgs {src = ./.;};
 
@@ -71,6 +75,7 @@
         docker = docker-lib;
         js = js-lib;
         yaml = yaml-lib;
+        git = git-lib;
         github = github-lib;
         shell = shell-lib;
         proto = proto-lib;
