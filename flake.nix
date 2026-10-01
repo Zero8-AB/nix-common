@@ -25,6 +25,7 @@
     proto-lib = import ./lib/proto {inherit yaml-lib;};
     nginx-lib = import ./lib/nginx;
     fonts-lib = import ./lib/fonts;
+    tofu-lib = import ./lib/tofu;
 
     prefixChecks = prefix:
       nixpkgs.lib.mapAttrs' (name: value: {
@@ -44,6 +45,9 @@
 
           yamlfmt
           actionlint
+
+          opentofu
+          tflint
 
           gitleaks
 
@@ -82,6 +86,7 @@
         nginx = nginx-lib;
         fonts = fonts-lib;
         postgres = postgres-lib;
+        tofu = tofu-lib;
       };
     };
 }
