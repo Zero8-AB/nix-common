@@ -50,8 +50,17 @@
         chmod -R +w repo
         cd repo
 
+        export HOME="$TMPDIR"
         export TFLINT_PLUGIN_DIR="$PWD/.tflint.d"
-        tflint --recursive --no-color
+
+        if test -f .tflint.hcl; then
+          export TFLINT_CONFIG_FILE="$PWD/.tflint.hcl"
+        fi
+
+        find . -name '*.tf' -printf '%h\n' | sort -u | while read -r dir; do
+          echo "linting $dir"
+          tflint --no-color --chdir "$dir"
+        done
 
         touch $out
       '';
