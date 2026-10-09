@@ -4,6 +4,7 @@ pkgs: {
   src,
   subPackages,
   vendorHash ? null,
+  race ? true,
 }:
 pkgs.buildGoModule {
   pname = "${pname}-test";
@@ -18,7 +19,7 @@ pkgs.buildGoModule {
       --format testdox \
       --junitfile $out/test-results.xml \
       --jsonfile $out/report.json \
-      -- -race -coverprofile=$out/coverage.out ./...
+      -- ${pkgs.lib.optionalString race "-race "}-coverprofile=$out/coverage.out ./...
 
     go tool cover -html=$out/coverage.out -o $out/coverage.html
 
