@@ -1,4 +1,4 @@
-pkgs: {
+shell-lib: pkgs: {
   pname,
   version,
   src,
@@ -6,7 +6,7 @@ pkgs: {
   vendorHash ? null,
   race ? true,
 }:
-pkgs.buildGoModule {
+shell-lib.requireSuccess pkgs (pkgs.buildGoModule {
   pname = "${pname}-test";
   inherit version src vendorHash subPackages;
 
@@ -15,14 +15,18 @@ pkgs.buildGoModule {
   checkPhase = ''
     runHook preCheck
 
-    gotestsum \
-      --format testdox \
-      --junitfile $out/test-results.xml \
-      --jsonfile $out/report.json \
-      -- ${pkgs.lib.optionalString race "-race "}-coverprofile=$out/coverage.out ./...
+    ${shell-lib.recordExitStatus ''
+      gotestsum \
+        --format testdox \
+        --junitfile $out/test-results.xml \
+        --jsonfile $out/report.json \
+        -- ${pkgs.lib.optionalString race "-race "}-coverprofile=$out/coverage.out ./...
+    ''}
 
-    go tool cover -html=$out/coverage.out -o $out/coverage.html
+    if [ -f $out/coverage.out ]; then
+      go tool cover -html=$out/coverage.out -o $out/coverage.html
+    fi
 
     runHook postCheck
   '';
-}
+})

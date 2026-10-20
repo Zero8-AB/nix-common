@@ -1,4 +1,4 @@
-pkgs: {
+shell-lib: pkgs: {
   pname,
   version,
   src,
@@ -11,12 +11,12 @@ pkgs: {
   resultsFile = "junit.xml";
   coverageDir = "coverage";
 in
-  import ./check.nix pkgs {
+  shell-lib.requireSuccess pkgs (import ./check.nix pkgs {
     inherit pname version src nodeModules nativeBuildInputs derivationArgs;
 
     name = "test";
 
-    command = "${command} --outputFile.junit=${resultsFile} --coverage.reportsDirectory=${coverageDir} ${pkgs.lib.escapeShellArgs extraArgs}";
+    command = shell-lib.recordExitStatus "${command} --outputFile.junit=${resultsFile} --coverage.reportsDirectory=${coverageDir} ${pkgs.lib.escapeShellArgs extraArgs}";
 
     installPhase = ''
       runHook preInstall
@@ -36,4 +36,4 @@ in
 
       runHook postInstall
     '';
-  }
+  })

@@ -1,4 +1,4 @@
-pkgs: {
+shell-lib: pkgs: {
   pname,
   version,
   src,
@@ -31,10 +31,10 @@ assert pkgs.lib.assertMsg (packageVersion == driverVersion) ''
   pinned browsers are ${driverVersion}. Align the package version with the
   browsers, or pass a matching browsers derivation.
 '';
-  import ./check.nix pkgs {
+  shell-lib.requireSuccess pkgs (import ./check.nix pkgs {
     inherit name pname version src nodeModules installPhase nativeBuildInputs;
 
-    command = ''
+    command = shell-lib.recordExitStatus ''
       export PLAYWRIGHT_BROWSERS_PATH=${browsers}
       export PLAYWRIGHT_SKIP_VALIDATE_HOST_REQUIREMENTS=true
 
@@ -47,4 +47,4 @@ assert pkgs.lib.assertMsg (packageVersion == driverVersion) ''
         PLAYWRIGHT_HTML_OUTPUT_DIR = "report";
       }
       // derivationArgs;
-  }
+  })

@@ -1,6 +1,8 @@
 {
   mkSandbox = import ./sandbox.nix;
 
+  inherit (import ./exit-status.nix) recordExitStatus requireSuccess;
+
   mkChecks = pkgs: {src}: {
     shellcheck =
       pkgs.runCommand "shellcheck" {

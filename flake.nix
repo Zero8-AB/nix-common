@@ -15,9 +15,9 @@
     nix-lib = import ./lib/nix;
     postgres-lib = import ./lib/postgres;
     dotnet-lib = import ./lib/dotnet {inherit nix-lib;};
-    go-lib = import ./lib/go {inherit nix-lib postgres-lib yaml-lib;};
+    go-lib = import ./lib/go {inherit nix-lib postgres-lib yaml-lib shell-lib;};
     docker-lib = import ./lib/docker;
-    js-lib = import ./lib/javascript {inherit nix-lib;};
+    js-lib = import ./lib/javascript {inherit nix-lib shell-lib;};
     yaml-lib = import ./lib/yaml {inherit nix-lib;};
     git-lib = import ./lib/git;
     github-lib = import ./lib/github;

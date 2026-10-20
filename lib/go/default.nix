@@ -2,9 +2,10 @@
   nix-lib,
   postgres-lib,
   yaml-lib,
+  shell-lib,
 }: {
   mkGoBuild = import ./go-build.nix;
-  mkGoTest = import ./go-test.nix;
+  mkGoTest = import ./go-test.nix shell-lib;
   mkGoSource = import ./go-source.nix;
   mkSqlcSource = import ./go-sqlc-source.nix {inherit yaml-lib;};
   mkGoLint = import ./go-lint.nix {inherit nix-lib;};
